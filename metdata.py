@@ -14,4 +14,3 @@ with open(lokalStasjon, "r") as localWeather:
     for line in weather:
         dato.append(line["Dato og tid"])
         temperatur.append(line["Temperatur (gr Celsius)"])
-print(f"dato: {dato}, temperatur: {temperatur}")
