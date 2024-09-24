@@ -1,15 +1,20 @@
 import datetime, csv
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
-dato1 = "06.12.2021 23:37"
-dato2 = "06/13/2021 01:04:58 am"
 
+lokalStasjon = "datafiler/trykk_og_temperaturlogg_rune_time.csv"
+
+
+dato = []
+temperatur = []
 
 
 def datetimeConverter(date_time_string):
     try:
         format1 = "%m.%d.%Y %H:%M"
         date_time = datetime.datetime.strptime(date_time_string, format1)
+        return date_time
     except:
         pass
     try:
@@ -21,19 +26,35 @@ def datetimeConverter(date_time_string):
             date_time = datetime.datetime.strptime(date_time_string, format3)
         except:
             pass
-    
     return date_time
 
 
+def gjennomsnittTemp():
+    gjennomsnittTempListe = []
+    temperaturFloat = [float(point.replace(",",".")) for point in temperatur]
+    calculator = 0
+    count = 0
+    for temp in temperaturFloat:
+        if count < 30:
+            calculator += temp
+            count += 1
+        else:
+            gjennomsnittTempListe.append(calculator/count)
+            calculator = 0
+            count = 0
+    return gjennomsnittTempListe
 
 
-
-
-lokalStasjon = "datafiler/trykk_og_temperaturlogg_rune_time.csv"
-
-dato = list()
-tidspunkt = list()
-temperatur = list()
+def aDate():
+    gjennomsnittDatoListe = []
+    count = 0
+    for d in dato:
+        if count < 30:
+            count += 1
+        else:
+            gjennomsnittDatoListe.append(d)
+            count = 0
+    return gjennomsnittDatoListe
 
 
 def opener():
@@ -42,20 +63,25 @@ def opener():
         for line in weather:
             dato.append(datetimeConverter(line["Dato og tid"]))
             temperatur.append(line["Temperatur (gr Celsius)"])
+        
 
-
-def plotter(x, y):
-    plt.plot(x,y)
-    plt.ylabel("temperatur")
-    plt.xlabel("Dato/klokkeslett")
+def plotter(x1, y1, x2, y2):
+    plt.plot(x1,y1, label="Temperatur")
+    plt.plot(x2,y2, label="Gjennomsnittstemperatur")
+    plt.gca().yaxis.set_major_locator(MaxNLocator(nbins=15, integer=True))
+    plt.gca().xaxis.set_major_locator(MaxNLocator(nbins=6))
+    plt.legend()
+    plt.xlabel("Dato")
+    plt.ylabel("Temp")
     plt.show()
-
 
 
 def main():
     opener()
-    plotter(dato, temperatur)
-    print("DATO1: ", dato[0], " DATO2: ",  dato[-1],"\n", "TEMP1: ", temperatur[0], " TEMP2: ", temperatur[-1])
+    temperaturFloat = [float(point.replace(",",".")) for point in temperatur]
+    gjennomsnitt = gjennomsnittTemp()
+    gx = aDate()
+    plotter(dato, temperaturFloat, gx, gjennomsnitt)
 
 
 if __name__=="__main__":
