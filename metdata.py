@@ -29,34 +29,8 @@ def datetimeConverter(date_time_string):
     return date_time
 
 
-# def gjennomsnittTemp():
-#     gjennomsnittTempListe = []
-#     temperaturFloat = [float(point.replace(",",".")) for point in temperatur]
-#     calculator = 0
-#     count = 0
-#     for temp in temperaturFloat:
-#         if count < 30:
-#             calculator += temp
-#             count += 1
-#         else:
-#             gjennomsnittTempListe.append(calculator/count)
-#             calculator = 0
-#             count = 0
-#     return gjennomsnittTempListe
-
-
-# def aDate():
-#     gjennomsnittDatoListe = []
-#     count = 0
-#     for d in dato:
-#         if count < 30:
-#             count += 1
-#         else:
-#             gjennomsnittDatoListe.append(d)
-#             count = 0
-#     return gjennomsnittDatoListe
-
-
+#Finner gjennomsnitt temperatur og datoer, returnerer en liste med en liste av datoer[0] og temperaturer[1], 
+#antall er hvor mange temperaturverdier du vil regne gjennomsnitt fra
 def gjennomsnitt(tid, temperaturer, antall):
     gjennomsnittTempListe = []
     gjennomsnittDatoListe = []
@@ -78,12 +52,9 @@ def gjennomsnitt(tid, temperaturer, antall):
         else:
             gjennomsnittDatoListe.append(d)
             count = 0
-
     totalGjennomsnitt.append(gjennomsnittDatoListe)
     totalGjennomsnitt.append(gjennomsnittTempListe)
-
     return totalGjennomsnitt
-
 
 
 #Åpner og leser inn temperatur og dato i en liste
@@ -104,14 +75,10 @@ def plotter(x1, y1, label):
     plt.ylabel("Temp")
     
 
-
 def main():
     opener()
     temperaturFloat = [float(point.replace(",",".")) for point in temperatur]
     averageDateTime = gjennomsnitt(dato, temperaturFloat, 30)
-    # gjennomsnitt = gjennomsnittTemp()
-    # gx = aDate()
-    print("dato: ", len(averageDateTime[0])," tid: ", len(averageDateTime[1]))
     plotter(dato, temperaturFloat, "Temperatur")
     plotter(averageDateTime[0], averageDateTime[1], "Gjennomsnittstemperatur")
 
