@@ -29,59 +29,93 @@ def datetimeConverter(date_time_string):
     return date_time
 
 
-def gjennomsnittTemp():
+# def gjennomsnittTemp():
+#     gjennomsnittTempListe = []
+#     temperaturFloat = [float(point.replace(",",".")) for point in temperatur]
+#     calculator = 0
+#     count = 0
+#     for temp in temperaturFloat:
+#         if count < 30:
+#             calculator += temp
+#             count += 1
+#         else:
+#             gjennomsnittTempListe.append(calculator/count)
+#             calculator = 0
+#             count = 0
+#     return gjennomsnittTempListe
+
+
+# def aDate():
+#     gjennomsnittDatoListe = []
+#     count = 0
+#     for d in dato:
+#         if count < 30:
+#             count += 1
+#         else:
+#             gjennomsnittDatoListe.append(d)
+#             count = 0
+#     return gjennomsnittDatoListe
+
+
+def gjennomsnitt(tid, temperaturer, antall):
     gjennomsnittTempListe = []
-    temperaturFloat = [float(point.replace(",",".")) for point in temperatur]
+    gjennomsnittDatoListe = []
+    totalGjennomsnitt = []
     calculator = 0
     count = 0
-    for temp in temperaturFloat:
-        if count < 30:
+    for temp in temperaturer:
+        if count < antall:
             calculator += temp
             count += 1
         else:
             gjennomsnittTempListe.append(calculator/count)
             calculator = 0
             count = 0
-    return gjennomsnittTempListe
-
-
-def aDate():
-    gjennomsnittDatoListe = []
     count = 0
-    for d in dato:
-        if count < 30:
+    for d in tid:
+        if count < antall:
             count += 1
         else:
             gjennomsnittDatoListe.append(d)
             count = 0
-    return gjennomsnittDatoListe
+
+    totalGjennomsnitt.append(gjennomsnittDatoListe)
+    totalGjennomsnitt.append(gjennomsnittTempListe)
+
+    return totalGjennomsnitt
 
 
+
+#Åpner og leser inn temperatur og dato i en liste
 def opener():
     with open(lokalStasjon, "r") as localWeather:
         weather = csv.DictReader(localWeather, delimiter=";")
         for line in weather:
             dato.append(datetimeConverter(line["Dato og tid"]))
             temperatur.append(line["Temperatur (gr Celsius)"])
-        
 
-def plotter(x1, y1, x2, y2):
-    plt.plot(x1,y1, label="Temperatur")
-    plt.plot(x2,y2, label="Gjennomsnittstemperatur")
+
+def plotter(x1, y1, label):
+    plt.plot(x1,y1, label=label)
     plt.gca().yaxis.set_major_locator(MaxNLocator(nbins=15, integer=True))
     plt.gca().xaxis.set_major_locator(MaxNLocator(nbins=6))
     plt.legend()
     plt.xlabel("Dato")
     plt.ylabel("Temp")
-    plt.show()
+    
 
 
 def main():
     opener()
     temperaturFloat = [float(point.replace(",",".")) for point in temperatur]
-    gjennomsnitt = gjennomsnittTemp()
-    gx = aDate()
-    plotter(dato, temperaturFloat, gx, gjennomsnitt)
+    averageDateTime = gjennomsnitt(dato, temperaturFloat, 30)
+    # gjennomsnitt = gjennomsnittTemp()
+    # gx = aDate()
+    print("dato: ", len(averageDateTime[0])," tid: ", len(averageDateTime[1]))
+    plotter(dato, temperaturFloat, "Temperatur")
+    plotter(averageDateTime[0], averageDateTime[1], "Gjennomsnittstemperatur")
+
+    plt.show()
 
 
 if __name__=="__main__":
