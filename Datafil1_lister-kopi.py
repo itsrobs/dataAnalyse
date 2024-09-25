@@ -7,7 +7,7 @@ Tid_norsknormaltid = list()
 Lufttemperatur = list()
 Lufttrykk = list()
 
-with open("Øvinger/Øving6_gruppeprosjekt/datafiler/temperatur_trykk_met_samme_rune_time_datasett.csv.txt"
+with open("GitHub/dataAnalyse/datafiler/temperatur_trykk_met_samme_rune_time_datasett.csv"
           , "r", encoding="utf-8") as datafil1:
     leser_filen = csv.reader(datafil1, delimiter= ";")
     next(leser_filen)
