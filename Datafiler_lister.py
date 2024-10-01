@@ -11,14 +11,15 @@ def Datafil1_lister():
         leser_filen = csv.reader(datafil1, delimiter= ";")
         next(leser_filen)
         for hver_rekke in leser_filen:
-            Tid_norsknormaltid.append(hver_rekke[2].replace(",","."))
-            Lufttemperatur.append(hver_rekke[3].replace(",","."))
-            Lufttrykk.append(hver_rekke[4].replace(",","."))
-        datafil1.close()
+            Tid_norsknormaltid.append(hver_rekke[2])
+            lufttemp_str = hver_rekke[3].replace(",", ".")
+            lufttrykk_str = hver_rekke[4].replace(",", ".")
+            
+            Lufttemperatur.append(float(lufttemp_str) if lufttemp_str else None)
+            Lufttrykk.append(float(lufttrykk_str) if lufttrykk_str else None)
     return Tid_norsknormaltid, Lufttemperatur, Lufttrykk
 
 # For å hente listene i en annen kode
-
 
 
 
@@ -32,12 +33,15 @@ def datafil2_MET_lister():
         lesing_fil = csv.reader(datafil2_MET, delimiter = ";")
         next(lesing_fil)
         for rekker in lesing_fil:
-                Datoer_MET.append(rekker[0].replace(",","."))
-                Trykk_barometer.append(rekker[2].replace(",","."))
-                Trykk_absolutt.append(rekker[3].replace(",","."))
-        
+            Datoer_MET.append(rekker[0])
+            trykk_barometer_str = rekker[2].replace(",", ".")
+            trykk_absolutt_str = rekker[3].replace(",", ".")
+            
 
-        datafil2_MET.close()
+            Trykk_barometer.append(float(trykk_barometer_str) if trykk_barometer_str else None)
+            Trykk_absolutt.append(float(trykk_absolutt_str) if trykk_absolutt_str else None)
+
+    
     return Trykk_absolutt, Trykk_barometer, Datoer_MET
 # For å hente listene i en annen kode
 
