@@ -1,87 +1,71 @@
-import csv
 import datetime
+from datetime import datetime
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 from matplotlib.ticker import MaxNLocator
 
-from Datafiler_lister import Datafil1_lister, datafil2_MET_lister
+from Datafiler_lister import Datafil_MET_lister, datafil_lokal_lister
 
-# Load data
-Tid_norsknormaltid, Lufttemperatur, Lufttrykk = Datafil1_lister()
-Trykk_absolutt, Trykk_barometer, Datoer_MET = datafil2_MET_lister()
+# Last inn lister
+Tid_norsknormaltid_MET, Lufttemperatur_MET, Lufttrykk_MET = Datafil_MET_lister()
+Trykk_absolutt_lokal, Trykk_barometer_lokal, Datoer_lokal = datafil_lokal_lister()
 
 
-# Function to convert date strings to datetime objects
-def konverter_dato(dato_tid):
-    formater = ["%m.%d.%Y %H:%M", "%m/%d/%Y %I:%M:%S %p", "%m/%d/%Y %H:%M:%S %p", "%d.%m.%Y %H:%M"]
+# Funksjon som konverterer datoene i lokal datafil til datetime objekter
+def konverter_dato_lokal(dato_tid):
+    formater = ["%m.%d.%Y %H:%M", "%m/%d/%Y %I:%M:%S %p", "%m/%d/%Y %H:%M:%S %p"]
     for formateringsformat in formater:
         try:
-            return datetime.datetime.strptime(dato_tid, formateringsformat)
+            return datetime.strptime(dato_tid, formateringsformat)
         except ValueError:
             continue
     return None
+datetime_datoer_lokal = [konverter_dato_lokal(dato) for dato in Datoer_lokal]
 
 
-konverterte_datoer = [konverter_dato(dato) for dato in Datoer_MET]
-konvertert_normaltid =[konverter_dato(dato) for dato in Tid_norsknormaltid]
-Trykk_absolutt = [float(x) * 10 for x in Trykk_absolutt]
-
-
-aligned_dates = []
-aligned_barometer = []
-for date, barometer in zip(konverterte_datoer, Trykk_barometer):
-    if barometer is not None:  # Check if barometer is not None
+# Funksjon som konverterer datoene i MET datafil til datetime objekter
+def konverter_dato_MET(dato_tid):
+    formater = ["%d.%m.%Y %H:%M"]
+    for formateringsformat in formater:
         try:
-            # Convert the barometer value to a float
-            aligned_barometer.append(float(barometer))  # Ensure conversion to float
-            aligned_dates.append(date)  # Append the corresponding date
+            return datetime.strptime(dato_tid, formateringsformat)
         except ValueError:
-            continue 
-aligned_barometer = [float(x) * 10 for x in aligned_barometer]
-
-aligned_normaltid = []
-aligned_lufttrykk = []
-
-for date, lufttrykk in zip(konvertert_normaltid, Lufttrykk):
-    if date is not None and lufttrykk is not None:
-        aligned_normaltid.append(date)
-        aligned_lufttrykk.append(float(lufttrykk))
+            continue
+    return None
+datetime_normaltid_MET =[konverter_dato_MET(dato) for dato in Tid_norsknormaltid_MET]
 
 
+# Funksjon som fikser korresponderende tall til datoer til Barometer trykk lokal liste
+def justere_lister_barometer(datetime_list, value_list):
+    justerte_datoer_lokal = []
+    justerte_barometer_lokal = []
+    for date, value in zip(datetime_list, value_list):
+        if date is not None and value is not None:
+            justerte_datoer_lokal.append(date)
+            justerte_barometer_lokal.append(value)
 
-# Function to convert a list of datetime objects to a uniform string format
-def format_datetimes(datetimes):
-    # Desired output format
-    desired_format = "%Y-%m-%d %H:%M"
-    
-    # Convert each datetime object to the desired format
-    formatted_dates = [dt.strftime(desired_format) for dt in datetimes]
-    
-    return formatted_dates
-
-formatted_list1 = format_datetimes(konverterte_datoer)
-formatted_list2 = format_datetimes(aligned_dates)
-formatted_list3 = format_datetimes(aligned_normaltid)
+    return justerte_datoer_lokal, justerte_barometer_lokal
+justert_datoer_lokal, justert_barometer_lokal = justere_lister_barometer(datetime_datoer_lokal, Trykk_barometer_lokal)
 
 
+# Justerer y verdier
+justert_barometer_lokal = [float(x) * 10 for x in justert_barometer_lokal]
+Trykk_absolutt_lokal = [float(x) * 10 for x in Trykk_absolutt_lokal]
 
 
-
-
-
-
+""" Starter plotting av grafene her """
+# Størrelse plot
 plt.figure(figsize=(12, 6))
 
-plt.plot(formatted_list1, Trykk_absolutt, color='blue', label='Absolutt Trykk')
-plt.plot(formatted_list2,aligned_barometer, color='orange', label='Barometer Trykk')
-plt.plot(formatted_list3,aligned_lufttrykk)
+# Plotter grafene
+plt.plot(datetime_datoer_lokal, Trykk_absolutt_lokal, color='blue', label="Absolutt Trykk")
+plt.plot(justert_datoer_lokal, justert_barometer_lokal, color='orange', label="Barometisk Trykk")
+plt.plot(datetime_normaltid_MET, Lufttrykk_MET, color="green", label= "Absolutt trykk MET")
 
-
-
-plt.gca().yaxis.set_major_locator(MaxNLocator(nbins=7))
+# Finjusterer x og y aksene
+plt.gca().yaxis.set_major_locator(MaxNLocator(nbins=8))
 plt.gca().xaxis.set_major_locator(MaxNLocator(nbins=7))
 plt.xticks(rotation=45)
-
+plt.legend()
 
 # Display the plot
 plt.show()
