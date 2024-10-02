@@ -7,7 +7,7 @@ from Datafiler_lister import Datafil_MET_lister, datafil_lokal_lister
 
 # Last inn lister
 Tid_norsknormaltid_MET, Lufttemperatur_MET, Lufttrykk_MET = Datafil_MET_lister()
-Trykk_absolutt_lokal, Trykk_barometer_lokal, Datoer_lokal = datafil_lokal_lister()
+Trykk_absolutt_lokal, Trykk_barometer_lokal, Datoer_lokal,Temperatur_lokal = datafil_lokal_lister()
 
 
 # Funksjon som konverterer datoene i lokal datafil til datetime objekter
