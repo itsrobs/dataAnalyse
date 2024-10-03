@@ -124,7 +124,7 @@ def punktSolned():
 
 def plotter(x1, y1, label, ylab, sub):
     # Tar inn liste med x og y-verdier, og plotter dem.
-    plt.gca().xaxis.set_major_formatter(DateFormatter("%m-%d %H"))
+    # plt.gca().xaxis.set_major_formatter(DateFormatter("%m-%d %H"))
     plt.subplot(2, 1, sub)
     plt.plot(x1,y1, label=label)
     #plt.gca().yaxis.set_major_locator(MaxNLocator(nbins=15, integer=True))
