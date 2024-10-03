@@ -131,7 +131,7 @@ def plotter(x1, y1, label, ylab, sub):
     #plt.gca().yaxis.set_major_locator(MaxNLocator(nbins=15, integer=True))
     #plt.gca().xaxis.set_major_locator(MaxNLocator(nbins=12))
     plt.legend()
-    plt.xlabel("Dato")
+    plt.xlabel("Tid")
     plt.ylabel(ylab)
     
     
