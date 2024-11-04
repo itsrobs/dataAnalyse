@@ -31,3 +31,4 @@ def solData():
     solNed = datetime.fromisoformat(hent_sol_tider("2021-06-11")[1])
     return solOpp, solNed
 
+ 
