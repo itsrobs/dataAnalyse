@@ -4,18 +4,17 @@ import datetime, csv
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from matplotlib.dates import DateFormatter
-
+from Sinnes_Sauda import Sinnes_sauda_lister, plotter_Sinnes_sauda
 
 # Filplassering for data som skal brukes i programmet
-lokal_stasjon = "datafiler/trykk_og_temperaturlogg_rune_time.csv"
-met_stasjon = "datafiler/temperatur_trykk_met_samme_rune_time_datasett.csv"
+lokal_stasjon = "dataAnalyse/datafiler/trykk_og_temperaturlogg_rune_time.csv"
+met_stasjon = "dataAnalyse/datafiler/temperatur_trykk_met_samme_rune_time_datasett.csv"
 
 # Setter opp tomme lister for bruk
 lokal_dato = []
 lokal_temperatur = []
 lokal_trykk = []
 lokal_abs_trykk = []
-
 
 met_dato = []
 met_temperatur = []
@@ -174,11 +173,43 @@ def temperaturFall():
             nedCount += 1
     return oppCount, nedCount
 
+# Plot for histogram
+def plot_histogram(data1, data2):
+    figure, (ax1, ax2) = plt.subplots(2, 1)
 
+    # histogram data: bins lager en serie intervaller med grader fra min til max, teller hver data som er i hver "bin"
+    ax1.hist(data1, bins=range(int(min(data1)), int(max(data1)) + 2))
+    ax1.set_xlabel('Temperatur (°C)')
+    ax1.set_ylabel('Antall')
+    ax1.set_title('Histogram over Lokal Temperatur')
+
+    # Plot andre histogram
+    ax2.hist(data2, bins=range(int(min(data2)), int(max(data2)) + 2))
+    ax2.set_xlabel('Temperatur (°C)')
+    ax2.set_ylabel('Antall')
+    ax2.set_title('Histogram over MET Temperatur')
+
+    plt.tight_layout()
+    plt.show()
+
+# Sinnes og sauda plot i eget vindu
+def plotter_Sinnes_sauda(Sinnes_tid, Sinnes_lufttemperatur, Sinnes_lufttrykk, Sauda_tid, Sauda_lufttemperatur, Sauda_lufttrykk,
+    met_dato, met_temperatur, met_trykk):
+    plt.subplot(2,1,1)
+    plt.plot(Sinnes_tid, Sinnes_lufttemperatur, label = "Sinnes lufttemperatur")
+    plt.plot(Sauda_tid, Sauda_lufttemperatur, label = "Sauda lufttemperatur")
+    plt.plot(met_dato, met_trykk, label = "Sola Lufttemperatur")
+    plt.legend()
+    plt.xticks(rotation=45)
+    plt.subplot(2,1,2)
+    plt.plot(Sinnes_tid, Sinnes_lufttrykk, label = "Sinnes lufttrykk")
+    plt.plot(Sauda_tid, Sauda_lufttrykk, label = "Sauda lufttrykk")
+    plt.plot(met_dato, met_temperatur, label = "Sola lufttrykk")
+    plt.xticks(rotation=45)
+    plt.legend()
+    plt.show()
 
 def main():
-    
-
     
     # Apner filer og laster dem inn i lister
     opener()
@@ -206,6 +237,16 @@ def main():
     plotter(lokal_dato, lokal_abs_trykk, "Absolutt trykk", "Trykk", 2)
     plotter(lokal_dato, lokal_trykk, "Barometrisk trykk", "Trykk", 2)
     plotter(met_dato, met_trykk, "Absolutt trykk MET", "Trykk", 2)
+
+    # Nytt vindu
+    plt.figure(figsize=(8, 6))
+    Sinnes_tid, Sinnes_lufttemperatur, Sinnes_lufttrykk, Sauda_tid, Sauda_lufttemperatur, Sauda_lufttrykk = Sinnes_sauda_lister()
+    
+    # Plot Sinnes-Sauda data
+    plotter_Sinnes_sauda(Sinnes_tid, Sinnes_lufttemperatur, Sinnes_lufttrykk, Sauda_tid, Sauda_lufttemperatur, Sauda_lufttrykk, met_dato, met_trykk, met_temperatur)
+    
+    # Plotter histogram
+    plot_histogram(lokal_temperatur, met_temperatur)
     
     # Viser fullført plot
     plt.show()
