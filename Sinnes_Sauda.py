@@ -1,7 +1,5 @@
 import csv
 import datetime
-import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
 
 def Sinnes_sauda_lister():
     Sinnes_tid = list()
@@ -39,16 +37,6 @@ def Sinnes_sauda_lister():
     return Sinnes_tid, Sinnes_lufttemperatur, Sinnes_lufttrykk, Sauda_tid, Sauda_lufttemperatur, Sauda_lufttrykk
 
 Sinnes_tid, Sinnes_lufttemperatur, Sinnes_lufttrykk, Sauda_tid, Sauda_lufttemperatur, Sauda_lufttrykk= Sinnes_sauda_lister()
-def plotter_Sinnes_sauda(Sinnes_tid, Sinnes_lufttemperatur, Sinnes_lufttrykk, Sauda_tid, Sauda_lufttemperatur, Sauda_lufttrykk):
-    plt.subplot(2,1,1)
-    plt.plot(Sinnes_tid, Sinnes_lufttemperatur, label = "Sinnes lufttemperatur")
-    plt.plot(Sauda_tid, Sauda_lufttemperatur, label = "Sauda lufttemperatur")
-    plt.legend()
-    plt.xticks(rotation=45)
-    plt.subplot(2,1,2)
-    plt.plot(Sinnes_tid, Sinnes_lufttrykk, label = "Sinnes lufttrykk")
-    plt.plot(Sauda_tid, Sauda_lufttrykk, label = "Sauda lufttrykk")
-    plt.xticks(rotation=45)
-    plt.legend()
-    plt.show()
+
+
 

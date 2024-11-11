@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
-from apiMET import hent_sol_tider, solData
+from apiMET import solData
 import datetime, csv
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
 from matplotlib.dates import DateFormatter
-from Sinnes_Sauda import Sinnes_sauda_lister, plotter_Sinnes_sauda
+from Sinnes_Sauda import Sinnes_sauda_lister
 import math
 
 # Filplassering for data som skal brukes i programmet
@@ -140,7 +139,6 @@ def plotter(x1, y1, label, ylab, sub, antall = 2):
     
 def solOppOgNed(kilde):
     solopp, solned = solData()
-    print(solopp)
     if kilde == "lokal":
         opp = 2
         ned = 2
@@ -254,16 +252,25 @@ def main():
     # Apner filer og laster dem inn i lister
     opener()
     metOpener()
-    
-        
+       
     # Regner ut gjennomsnitt
     averageDateTime = gjennomsnitt(lokal_dato, lokal_temperatur, 30)
+    
+    """
+    averageStandardAvvik = []
+    for n in range(len(averageDateTime[1])):
+        averageStandardAvvik.append(((lokal_temperatur[n]-averageDateTime[1][n])**2)/(len(averageDateTime)))
+    """
+    
 
     # Setter opp Subplots
     plt.subplots(2, 1)
+    
     # Øvre Subplot
     plotter(lokal_dato, lokal_temperatur, "Lokal Temperatur", "Temp", 1)
-    plotter(averageDateTime[0], averageDateTime[1], "Gjennomsnittstemperatur", "Temp", 1)
+
+
+    plt.errorbar(averageDateTime[0], averageDateTime[1], yerr=standardAvvik(lokal_temperatur), errorevery=30, capsize=4, label = "Gjennomsnittlig Temperatur med Standardavvik")
     plotter(met_dato, met_temperatur, "MET Temperatur", "Temp", 1)
     plotter(*finnLinje(solOppOgNed("lokal"), "lokal"), "Temperaturfall soloppgang til solnedgang Lokal", "Temp", 1)
     plotter(*finnLinje(temperaturFall("lokal"), "lokal"), "Temperaturfall maksimal til minimal Lokal", "Temp", 1)
@@ -279,7 +286,6 @@ def main():
     trykk_average = gjennomsnitt(lokal_dato, trykkDifferanse(lokal_trykk, lokal_abs_trykk), 10)  
     plotter(trykk_average[0], trykk_average[1], "Trykk Differanse", "Trykk Differanse", 1, 1)
     
-    #'''
     # Nytt vindu
     plt.figure(figsize=(8, 6))
     Sinnes_tid, Sinnes_lufttemperatur, Sinnes_lufttrykk, Sauda_tid, Sauda_lufttemperatur, Sauda_lufttrykk = Sinnes_sauda_lister()
@@ -289,7 +295,6 @@ def main():
     
     # Plotter histogram
     plot_histogram(lokal_temperatur, met_temperatur)
-   #'''  
    
     # Viser fullført plot
     plt.show()
