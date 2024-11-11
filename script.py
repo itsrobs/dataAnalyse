@@ -215,7 +215,7 @@ def plot_histogram(data1, data2):
     ax2.set_title('Histogram over MET Temperatur')
 
     plt.tight_layout()
-    plt.show()
+    # plt.show()
 
 # Sinnes og sauda plot i eget vindu
 def plotter_Sinnes_sauda(Sinnes_tid, Sinnes_lufttemperatur, Sinnes_lufttrykk, Sauda_tid, Sauda_lufttemperatur, Sauda_lufttrykk,
@@ -232,7 +232,7 @@ def plotter_Sinnes_sauda(Sinnes_tid, Sinnes_lufttemperatur, Sinnes_lufttrykk, Sa
     plt.plot(met_dato, met_temperatur, label = "Sola lufttrykk")
     plt.xticks(rotation=45)
     plt.legend()
-    plt.show()
+    # plt.show()
 
 
 def standardAvvik(maalinger):
@@ -248,11 +248,47 @@ def standardAvvik(maalinger):
 
 
 def main():
-    
     # Apner filer og laster dem inn i lister
     opener()
     metOpener()
-       
+    # print(lokal_dato)
+
+    datoliste = []
+
+    lokal_trykk2 = []
+    lokal_temp2 = []
+
+    met_temp2 = []
+    met_trykk2 = []
+
+    ftemp = []
+    ftrykk = []
+
+    for index, temp in enumerate(lokal_temperatur):
+        nosec = lokal_dato[index].replace(second=00)
+        if nosec in met_dato and nosec not in datoliste:
+            lokal_temp2.append(temp)
+            datoliste.append(nosec)
+            lokal_trykk2.append(lokal_trykk[index])
+
+    for index, temp in enumerate(met_temperatur):
+        if met_dato[index] in datoliste:
+            met_temp2.append(temp)
+            met_trykk2.append(met_trykk[index])
+        
+    for i, d in enumerate(datoliste):
+        ftemp.append(abs(met_temp2[i]-lokal_temp2[i]))
+        ftrykk.append(abs(met_trykk2[i]-lokal_trykk2[i]))
+
+
+
+    gjennomsnittForskjellTemp = sum(ftemp)/len(ftemp)
+    gjennomsnittForskjellTrykk = sum(ftrykk)/len(ftrykk)
+    print(f"Gjennomsnittlig temperaturforskjell: {gjennomsnittForskjellTemp},\nGjennomsnitt trykkforskjell: {gjennomsnittForskjellTrykk}")
+    print(f"Maks temp forskjell: {max(ftemp)} dato: {datoliste[ftemp.index(max(ftemp))]} \nMin temp forskjell: {min(ftemp)} dato: {datoliste[ftemp.index(min(ftemp))]}")
+    print(f"Maks trykk forskjell: {max(ftrykk)} dato: {datoliste[ftrykk.index(max(ftrykk))]}\nMin trykk forskjell: {min(ftrykk)} dato: {datoliste[ftrykk.index(min(ftrykk))]}")
+
+
     # Regner ut gjennomsnitt
     averageDateTime = gjennomsnitt(lokal_dato, lokal_temperatur, 30)
     
@@ -268,6 +304,9 @@ def main():
     
     # Øvre Subplot
     plotter(lokal_dato, lokal_temperatur, "Lokal Temperatur", "Temp", 1)
+
+    plt.plot(datoliste, ftemp, label="Forskjell på temp")
+    plt.plot(datoliste, ftrykk, label="Forskjell på trykk")
 
 
     plt.errorbar(averageDateTime[0], averageDateTime[1], yerr=standardAvvik(lokal_temperatur), errorevery=30, capsize=4, label = "Gjennomsnittlig Temperatur med Standardavvik")
