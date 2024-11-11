@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 from matplotlib.dates import DateFormatter
 from Sinnes_Sauda import Sinnes_sauda_lister, plotter_Sinnes_sauda
-import math
 
 # Filplassering for data som skal brukes i programmet
 lokal_stasjon = "datafiler/trykk_og_temperaturlogg_rune_time.csv"
@@ -20,6 +19,9 @@ lokal_abs_trykk = []
 met_dato = []
 met_temperatur = []
 met_trykk = []
+
+# Spesifiserer indekser med onsket tidspunkt for solnedgang mellom
+# 11. juni 2021 klokka 17:31 til 12. juni 2021 klokka 03:05
 
 
 def datetimeConverter(date_time_string):
@@ -111,25 +113,27 @@ def metOpener():
                 tempTrykk = line["Lufttrykk i havnivaa"].replace(",",".")
                 met_trykk.append(float(tempTrykk))
 
-def trykkDifferanse(lst1, lst2):
-    differanseListe = []
-    for i in range(len(lst1)):
-        differanseListe.append(abs(lst1[i]-lst2[i]))
-    return differanseListe
-
-
-def finnLinje(variabel, kilde):
-    # finner og returnerer to lister, x[p1, p2] og y[p1, p2]
-    p1 = [eval(kilde+"_dato")[variabel[0]], eval(kilde+"_temperatur")[variabel[0]]]
-    p2 = [eval(kilde+"_dato")[variabel[1]], eval(kilde+"_temperatur")[variabel[1]]]
+def punktSolned(variabel):
+    # Henter inn punkt manuel fra solned_indekser
+    p1 = [lokal_dato[variabel[0]], lokal_temperatur[variabel[0]]]
+    p2 = [lokal_dato[variabel[1]], lokal_temperatur[variabel[1]]]
     x = [p1[0], p2[0]]
     y = [p1[1], p2[1]]
     return x, y
 
-def plotter(x1, y1, label, ylab, sub, antall = 2):
+def punktSolnedMet(variabel):
+    # Henter inn punkt manuel fra solned_indekser
+    p1 = [lokal_dato[variabel[0]], met_temperatur[variabel[0]]]
+    p2 = [lokal_dato[variabel[1]], met_temperatur[variabel[1]]]
+    x = [p1[0], p2[0]]
+    y = [p1[1], p2[1]]
+    return x, y
+
+
+def plotter(x1, y1, label, ylab, sub):
     # Tar inn liste med x og y-verdier, og plotter dem.
     plt.gca().xaxis.set_major_formatter(DateFormatter("%m-%d %H"))
-    plt.subplot(antall, 1, sub)
+    plt.subplot(2, 1, sub)
     plt.plot(x1,y1, label=label)
     #plt.gca().yaxis.set_major_locator(MaxNLocator(nbins=15, integer=True))
     #plt.gca().xaxis.set_major_locator(MaxNLocator(nbins=12))
@@ -138,67 +142,68 @@ def plotter(x1, y1, label, ylab, sub, antall = 2):
     plt.ylabel(ylab)
     
     
-def solOppOgNed(kilde):
+def solOppOgNed():
     solopp, solned = solData()
-    print(solopp)
-    if kilde == "lokal":
-        opp = 2
-        ned = 2
-        for i in eval(kilde+"_dato"):
-            
-            if str(i.strftime('%H:%M')) == solopp.strftime('%H:%M'):
-                break
-            else:
-                opp += 1
-            
-        for i in eval(kilde+"_dato"):
-            
-            if str(i.strftime('%H:%M')) == solned.strftime('%H:%M'):
-                break
-            else:
-                ned += 1
-    else:
-        opp = 1
-        ned = 1
-        for i in eval(kilde+"_dato"):
-            
-            if str(i.strftime('%d %H')) == solopp.strftime('12 %H'):
-                break
-            else:
-                opp += 1
-            
-        for i in eval(kilde+"_dato"):
-            
-            if str(i.strftime('%d %H')) == solned.strftime('11 %H'):
-                break
-            else:
-                ned += 1
+    opp = 2
+    ned = 2
+    for i in lokal_dato:
+        
+        if str(i.strftime('%H:%M')) == solopp.strftime('%H:%M'):
+            break
+        else:
+            opp += 1
+        
+    for i in lokal_dato:
+        
+        if str(i.strftime('%H:%M')) == solned.strftime('%H:%M'):
+            break
+        else:
+            ned += 1
     return opp, ned
 
 
-def temperaturFall(kilde):
-    if kilde == "lokal":
-        opp, ned =  "11 17:31", '12 03:05'
-    else:
-        opp, ned = "11 18:00", "12 03:00"
+def temperaturFall():
+    opp, ned =  "03:05", "17:31"
     oppCount = 2
     nedCount = 2
-    for i in eval(kilde+"_dato"):
-        if str(i.strftime('%d %H:%M')) == opp:
+    for i in lokal_dato:
+        
+        if str(i.strftime('%H:%M')) == opp:
             break
         else:
             oppCount += 1
         
-    for i in eval(kilde+"_dato"):
+    for i in lokal_dato:
         
-        if str(i.strftime('%d %H:%M')) == ned:
+        if str(i.strftime('%H:%M')) == ned:
             break
         else:
             nedCount += 1
     return oppCount, nedCount
 
 
-
+def temperaturFallMet():
+    opp, ned =  "03:00", "18:00"
+    oppCount = 2
+    nedCount = 2
+    oppEkstraCount = 1
+    for i in met_dato:
+        
+        if str(i.strftime('%H:00')) == opp:
+            if oppEkstraCount == 0:
+                break
+            else:
+                oppEkstraCount = 0
+        else:
+            oppCount += 1
+        
+    for i in met_dato:
+        
+        if str(i.strftime('%H:%M')) == ned:
+                break
+        else:
+            nedCount += 1
+    return oppCount, nedCount
 
 # Plot for histogram
 def plot_histogram(data1, data2):
@@ -236,50 +241,36 @@ def plotter_Sinnes_sauda(Sinnes_tid, Sinnes_lufttemperatur, Sinnes_lufttrykk, Sa
     plt.legend()
     plt.show()
 
-
-def standardAvvik(maalinger):
-    summgjennomsnitt = 0.0
-    summstandardavvik = 0.0
-    for n in range(len(maalinger)):
-        summgjennomsnitt += maalinger[n]
-    gjennomsnittet = (1/len(maalinger)*summgjennomsnitt)  
-    for n in range(len(maalinger)):
-       summstandardavvik += (maalinger[n]-gjennomsnittet)**2
-    standardavvik = math.sqrt((1/(len(maalinger)-1)) * summstandardavvik)
-    return standardavvik
-
-
 def main():
     
     # Apner filer og laster dem inn i lister
     opener()
     metOpener()
     
-        
     # Regner ut gjennomsnitt
     averageDateTime = gjennomsnitt(lokal_dato, lokal_temperatur, 30)
+    
+    solOppOgNed()
+    temperaturFall()
+
 
     # Setter opp Subplots
     plt.subplots(2, 1)
+    
     # Øvre Subplot
     plotter(lokal_dato, lokal_temperatur, "Lokal Temperatur", "Temp", 1)
     plotter(averageDateTime[0], averageDateTime[1], "Gjennomsnittstemperatur", "Temp", 1)
     plotter(met_dato, met_temperatur, "MET Temperatur", "Temp", 1)
-    plotter(*finnLinje(solOppOgNed("lokal"), "lokal"), "Temperaturfall soloppgang til solnedgang Lokal", "Temp", 1)
-    plotter(*finnLinje(temperaturFall("lokal"), "lokal"), "Temperaturfall maksimal til minimal Lokal", "Temp", 1)
-    #plotter(*finnLinje(temperaturFall("met"), "met"), "Temperaturfall maksimal til minimal MET", "Temp", 1)
-    plotter(*finnLinje(solOppOgNed("met"), "met"), "Temperaturfall soloppgang til solnedgang MET", "Temp", 1)
+    plotter(*punktSolned(solOppOgNed()), "Temperaturfall soloppgang til solnedgang", "Temp", 1)
+    plotter(*punktSolned(temperaturFall()), "Temperaturfall maksimal til minimal Lokal", "Temp", 1)
+    plotter(*punktSolnedMet(temperaturFallMet()), "Temperaturfall maksimal til minimal MET", "Temp", 1)
+    
     
     # Nedre Subplot
     plotter(lokal_dato, lokal_abs_trykk, "Absolutt trykk", "Trykk", 2)
     plotter(lokal_dato, lokal_trykk, "Barometrisk trykk", "Trykk", 2)
-    plotter(met_dato, met_trykk, "Absolutt trykk MET", "Trykk", 2) 
-    plt.figure(figsize=(8, 6))
-
-    trykk_average = gjennomsnitt(lokal_dato, trykkDifferanse(lokal_trykk, lokal_abs_trykk), 10)  
-    plotter(trykk_average[0], trykk_average[1], "Trykk Differanse", "Trykk Differanse", 1, 1)
-    
-    #'''
+    plotter(met_dato, met_trykk, "Absolutt trykk MET", "Trykk", 2)
+    '''
     # Nytt vindu
     plt.figure(figsize=(8, 6))
     Sinnes_tid, Sinnes_lufttemperatur, Sinnes_lufttrykk, Sauda_tid, Sauda_lufttemperatur, Sauda_lufttrykk = Sinnes_sauda_lister()
@@ -289,8 +280,7 @@ def main():
     
     # Plotter histogram
     plot_histogram(lokal_temperatur, met_temperatur)
-   #'''  
-   
+   '''  
     # Viser fullført plot
     plt.show()
 

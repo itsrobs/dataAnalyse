@@ -12,7 +12,7 @@ def Sinnes_sauda_lister():
     Sauda_lufttemperatur = list()
     Sauda_lufttrykk = list()
 
-    with open("dataAnalyse/datafiler/temperatur_trykk_sauda_sinnes_samme_tidsperiode.csv", "r",
+    with open("datafiler/temperatur_trykk_sauda_sinnes_samme_tidsperiode.csv", "r",
         encoding= "UTF-8") as Sinnes_Sauda_fil:
         leser_sinnes_sauda = csv.reader(Sinnes_Sauda_fil, delimiter= ";")
         next(leser_sinnes_sauda)
